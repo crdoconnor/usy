@@ -44,8 +44,7 @@ Copy the file usy.py into your project and use:
   True
 
   >>> parsed["property3"] = "3"
-
-  >>> parsed.dump()
+  >>> parsed.as_yaml()
   # Simple YAML file
   property1: value1
   property2: 2
