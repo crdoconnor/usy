@@ -1,4 +1,4 @@
-from hitchstory import StoryCollection, StorySchema, BaseEngine, validate, exceptions
+from hitchstory import StoryCollection, StorySchema, BaseEngine, exceptions
 from hitchrun import Path, hitch_maintenance, expected
 from commandlib import Command
 from pathquery import pathq
@@ -23,7 +23,14 @@ class Paths(object):
 
 class Engine(BaseEngine):
     schema = StorySchema(
-        preconditions={"files": MapPattern(Str(), Str())},
+        preconditions={
+            "files": MapPattern(Str(), Str()),
+            "variables": MapPattern(Str(), Str()),
+            "python version": Str(),
+        },
+        params={
+            "python version": Str(),
+        },
     )
 
     def __init__(self, keypath):
@@ -40,10 +47,16 @@ class Engine(BaseEngine):
                 filepath.dirname().mkdir()
             filepath.write_text(str(text))
 
+        for filename, text in self.preconditions.get("variables", {}).items():
+            filepath = self.path.state.joinpath(filename)
+            if not filepath.dirname().exists():
+                filepath.dirname().mkdir()
+            filepath.write_text(str(text))
+
         self.path.project.joinpath("usy.py").copy(self.path.state)
 
         self.python_package = hitchpython.PythonPackage(
-            self.preconditions.get('python_version', '3.5.0')
+            self.preconditions.get('python_version', self.preconditions['python version'])
         )
         self.python_package.build()
 
@@ -60,7 +73,6 @@ class Engine(BaseEngine):
             shutdown_timeout=1.0
         )
 
-
         self.services['IPython'] = hitchpython.IPythonKernelService(self.python_package)
 
         self.services.startup(interactive=False)
@@ -69,7 +81,11 @@ class Engine(BaseEngine):
         self.ipython_step_library.startup_connection(self.ipython_kernel_filename)
 
         self.run("import os")
+        self.run("from path import Path")
         self.run("os.chdir('{}')".format(self.path.state))
+
+        for var, value in self.preconditions.get("variables", {}).items():
+            self.run("{0} = Path('{0}').bytes().decode('utf8')".format(var))
 
     def run(self, command):
         self.ipython_step_library.run(command)
@@ -80,6 +96,33 @@ class Engine(BaseEngine):
     def assert_exception(self, command, exception):
         self.ipython_step_library.assert_exception(command, exception)
 
+    def shell(self):
+        if hasattr(self, 'services'):
+            self.services.start_interactive_mode()
+            import sys
+            import time
+            from os import path
+            from subprocess import call
+            time.sleep(0.5)
+            if path.exists(path.join(
+                path.expanduser("~"), ".ipython/profile_default/security/",
+                self.ipython_kernel_filename)
+            ):
+                call([
+                        sys.executable, "-m", "IPython", "console",
+                        "--existing",
+                        path.join(
+                            path.expanduser("~"),
+                            ".ipython/profile_default/security/",
+                            self.ipython_kernel_filename
+                        )
+                    ])
+            else:
+                call([
+                    sys.executable, "-m", "IPython", "console",
+                    "--existing", self.ipython_kernel_filename
+                ])
+            self.services.stop_interactive_mode()
 
     def tear_down(self):
         """Clean out the state directory."""
@@ -97,8 +140,11 @@ def test(*words):
     """
     Run test with words.
     """
-    STORY_COLLECTION = StoryCollection(pathq(KEYPATH).ext("story"), Engine(KEYPATH))
-    print(STORY_COLLECTION.shortcut(*words).play().report())
+    print(
+        StoryCollection(
+            pathq(KEYPATH).ext("story"), Engine(KEYPATH)
+        ).shortcut(*words).play().report()
+    )
 
 
 def ci():
@@ -106,7 +152,11 @@ def ci():
     Run all stories.
     """
     lint()
-    print(STORY_COLLECTION.ordered_by_name().play().report())
+    print(
+        StoryCollection(
+            pathq(KEYPATH).ext("story"), Engine(KEYPATH)
+        ).ordered_by_name().play().report()
+    )
 
 
 def hitch(*args):
