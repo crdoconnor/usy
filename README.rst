@@ -2,7 +2,8 @@ Ultra Simple YAML
 =================
 
 Ultra Simple YAML is a tiny module designed to parse a *very*
-restricted subset of YAML. It is a sister project of StrictYAML
+restricted subset of YAML. It is a sister project of
+`StrictYAML <https://github.com/crdoconnor/strictyaml/>`_
 which parses a larger (albeit still restricted) subset of YAML.
 
 It is designed to be includeable in larger projects where
