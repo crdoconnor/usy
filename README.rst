@@ -7,7 +7,8 @@ restricted subset of YAML. It is a sister project of
 which parses a larger (albeit still restricted) subset of YAML.
 
 It is designed to be includeable in larger projects where
-including an entire additional module would be a problem.
+including an entire additional module would be a problem. It
+has a BSD-2 Clause license - the least restrictive possible.
 
 Install
 -------
