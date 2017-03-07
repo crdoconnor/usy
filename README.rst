@@ -8,6 +8,12 @@ which parses a larger (albeit still restricted) subset of YAML.
 It is designed to be includeable in larger projects where
 including an entire additional module would be a problem.
 
+Install
+-------
+
+All the code is in one file: usy.py. Simply copy that file into
+your code base.
+
 Usage
 -----
 
