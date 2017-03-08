@@ -1,8 +1,12 @@
-Example:
+Base story:
   params:
     python version: 3.5.0
   preconditions:
     python version: (( python version ))
+
+Example:
+  based on: Base story
+  preconditions:
     files:
       example.yaml: |
         # Simple YAML file
@@ -16,6 +20,22 @@ Example:
           contents = handle.read()
 
         parsed = usy.load(contents)
+
+Invalid YAML:
+  based on: Base story
+  preconditions:
+    variables:
+      example_yaml: |
+        # YAML file with indent
+        property1: value1
+          property2: 2
+  scenario:
+    - Assert Exception:
+        command: |
+          import usy
+
+          parsed = usy.load(example_yaml)
+        exception: InvalidYAML
 
 Repr:
   based on: Example

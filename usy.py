@@ -1,17 +1,29 @@
 """
 Ultra-Strict YAML
 
+Usage::
+
+  import usy
+
+  with open('example.yaml', 'r') as handle:
+     contents = handle.read()
+
+  parsed = usy.load(contents)
+
+
+License::
+
 Copyright (c) 2017, Colm O'Connor
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met: 
+modification, are permitted provided that the following conditions are met:
 
 1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer. 
+   list of conditions and the following disclaimer.
 2. Redistributions in binary form must reproduce the above copyright notice,
    this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution. 
+   and/or other materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -25,9 +37,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+
+class USYException(Exception):
+    pass
+
+
+class InvalidYAML(USYException):
+    pass
+
+
 class Line(object):
     def __init__(self, text):
         self._text = text
+
+        if text.startswith(" "):
+            raise InvalidYAML((
+                "Line '{0}' starts with a space - this may "
+                "be valid YAML but it is not valid USYAML."
+            ).format(text))
 
     @property
     def is_key_value(self):
