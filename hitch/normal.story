@@ -25,16 +25,25 @@ Invalid YAML:
   based on: Base story
   preconditions:
     variables:
-      example_yaml: |
+      example_indented: |
         # YAML file with indent
         property1: value1
           property2: 2
+      example_not_property: |
+        # YAML file without :
+        just a line of text
   scenario:
     - Assert Exception:
         command: |
           import usy
 
-          parsed = usy.load(example_yaml)
+          parsed = usy.load(example_indented)
+        exception: InvalidYAML
+    - Assert Exception:
+        command: |
+          import usy
+
+          parsed = usy.load(example_not_property)
         exception: InvalidYAML
 
 Repr:
