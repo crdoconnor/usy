@@ -59,9 +59,9 @@ class Line(object):
         if not text.startswith("#"):
             if ":" not in text:
                 raise InvalidYAML((
-                "Line '{0}' does not contain a ':' indicating "
-                "a property so it is not valid USYAML."
-            ).format(text))
+                    "Line '{0}'      not contain a ':' indicating "
+                    "a property so it is not valid USYAML."
+                ).format(text))
 
     @property
     def is_key_value(self):
