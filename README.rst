@@ -4,11 +4,16 @@ Ultra Simple YAML
 Ultra Simple YAML is a tiny module designed to parse a *very*
 restricted subset of YAML. It is a sister project of
 `StrictYAML <https://github.com/crdoconnor/strictyaml/>`_
-which parses a larger (albeit still restricted) subset of YAML.
+which parses a larger subset of YAML (still restricted, albeit
+for different reasons).
 
 It is designed to be includeable in larger projects where
-including an entire additional module would be a problem. It
-has a BSD-2 Clause license - the least restrictive possible.
+including an entire additional module is not desirable or possible
+but you still don't want to use INI.
+
+It is licensed with a BSD-2 Clause license - the least restrictive
+possible.
+
 
 Install
 -------
